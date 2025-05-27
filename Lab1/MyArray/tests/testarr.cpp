@@ -45,7 +45,7 @@ TEST_F(ArrayTest, MoveConstructor) {
 TEST_F(ArrayTest, AssignmentOperator) {
 	default_array = init_array;
 	test_array_content(default_array, {1, 2, 3, 4, 5});
-	default_array = default_array;  // self-assign
+	default_array = default_array;
 	test_array_content(default_array, {1, 2, 3, 4, 5});
 }
 
@@ -66,11 +66,32 @@ TEST_F(ArrayTest, ComparisonOperators) {
 	EXPECT_LT(arr1, arr3);
 	EXPECT_GT(arr3, arr1);
 }
+	TEST_F(ArrayTest, ThreeWayComparison) {
+	IntArray5 arr1{1, 2, 3, 4, 5};
+	IntArray5 arr2{1, 2, 3, 4, 5};
+	IntArray5 arr3{1, 2, 3, 4, 6};
+	IntArray5 arr4{0, 2, 3, 4, 5};
+
+	EXPECT_TRUE((arr1 <=> arr2) == std::strong_ordering::equal);
+	EXPECT_TRUE((arr1 <=> arr3) == std::strong_ordering::less);
+	EXPECT_TRUE((arr1 <=> arr4) == std::strong_ordering::greater);
+	EXPECT_TRUE(arr1 <= arr3);
+	EXPECT_TRUE(arr1 >= arr4);
+}
 
 TEST_F(ArrayTest, SwapMethod) {
 	init_array.swap(another_array);
 	test_array_content(init_array, {6, 7, 8, 9, 10});
 	test_array_content(another_array, {1, 2, 3, 4, 5});
+}
+
+	TEST_F(ArrayTest, SwapDifferentArrays) {
+	IntArray5 arr1{1, 2, 3, 4, 5};
+	IntArray5 arr2{6, 7, 8, 9, 10};
+
+	arr1.swap(arr2);
+	test_array_content(arr1, {6, 7, 8, 9, 10});
+	test_array_content(arr2, {1, 2, 3, 4, 5});
 }
 
 TEST_F(ArrayTest, AtMethod) {
@@ -117,6 +138,14 @@ TEST_F(ArrayTest, ReverseIterators) {
 	auto crit = const_ref.crbegin();
 	EXPECT_EQ(*crit, 5);
 }
+	TEST_F(ArrayTest, ReverseIteratorEnd) {
+	auto rit = init_array.rend();
+	EXPECT_EQ(*(--rit), init_array[0]);
+
+	const auto& const_ref = init_array;
+	auto crit = const_ref.crend();
+	EXPECT_EQ(*(--crit), const_ref[0]);
+}
 
 TEST_F(ArrayTest, SizeMethods) {
 	EXPECT_EQ(init_array.size(), 5);
@@ -124,11 +153,14 @@ TEST_F(ArrayTest, SizeMethods) {
 	EXPECT_FALSE(init_array.empty());
 }
 
-TEST_F(ArrayTest, FillMethod) {
-	init_array.fill(42);
-	test_array_content(init_array, {42, 42, 42, 42, 42});
-}
+	TEST_F(ArrayTest, FillDifferentValues) {
+	IntArray5 arr;
+	arr.fill(42);
+	test_array_content(arr, {42, 42, 42, 42, 42});
 
+	arr.fill(-1);
+	test_array_content(arr, {-1, -1, -1, -1, -1});
+}
 TEST_F(ArrayTest, AtOutOfRange) {
 	EXPECT_THROW(default_array.at(5), std::out_of_range);
 	const auto& const_ref = default_array;
