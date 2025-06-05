@@ -20,7 +20,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     )
 endif()
 
-
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -30,20 +29,32 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 
-add_library(bigint
+add_library(my_bigint
         include/bigint.hpp
         src/bigint.cpp
 )
 
-target_include_directories(bigint
+target_include_directories(my_bigint
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_compile_options(my_bigint PRIVATE ${COMMON_FLAGS})
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(my_bigint PRIVATE ${COVERAGE_FLAGS})
+    target_link_options(my_bigint PRIVATE ${COVERAGE_FLAGS})
+endif()
 
 add_executable(bigint_tests
         tests/test.cpp
 )
 
+target_compile_options(bigint_tests PRIVATE ${COMMON_FLAGS})
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(bigint_tests PRIVATE ${COVERAGE_FLAGS})
+    target_link_options(bigint_tests PRIVATE ${COVERAGE_FLAGS})
+endif()
+
 target_link_libraries(bigint_tests
-        PRIVATE bigint
+        PRIVATE my_bigint
         PRIVATE GTest::gtest_main
 )
 
