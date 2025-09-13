@@ -31,9 +31,6 @@ include(GoogleTest)
 
 add_library(my_vector
         include/vector.hpp
-        include/deque.hpp
-        include/list.hpp
-        include/container.hpp
         src/vector.cpp
 )
 
